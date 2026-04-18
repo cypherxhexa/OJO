@@ -15,7 +15,7 @@ const ReactQuill = dynamic(
   async () => {
     const { default: RQ } = await import("react-quill");
     // Forward the ref properly for ReactQuill in Next 13+ if needed, or just return it
-    // @ts-ignore
+    // @ts-expect-error - ReactQuill types are sometimes mismatched in Next dynamic imports
     return function ForwardedQuill(props) { return <RQ {...props} />; };
   },
   {
@@ -129,7 +129,7 @@ export default function JobForm({ initialData }: { initialData?: Partial<Job> | 
       <div>
         <label className="block text-sm font-medium text-stone-700 mb-1">Description *</label>
         <div className="bg-white [&_.ql-container]:min-h-[200px] [&_.ql-editor]:text-stone-800 [&_.ql-toolbar]:border-stone-300 [&_.ql-container]:border-stone-300 [&_.ql-container]:rounded-b [&_.ql-toolbar]:rounded-t [&_.ql-editor]:font-sans">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error - ReactQuill typing conflict with dynamic import wrapper */}
           <ReactQuill 
             theme="snow"
             value={description} 
