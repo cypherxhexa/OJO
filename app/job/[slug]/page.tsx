@@ -6,7 +6,7 @@ import { JobPostingJsonLd } from "@/components/JobPostingJsonLd";
 import { prisma } from "@/lib/db";
 
 const SITE_NAME = "Job Opp Jarrar";
-const BASE_URL = "https://joboppjarrar.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://joboppjarrar.com";
 
 export async function generateMetadata({
   params,

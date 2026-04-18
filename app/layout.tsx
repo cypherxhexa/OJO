@@ -8,7 +8,7 @@ const lora = Lora({ subsets: ["latin"], variable: "--font-lora" });
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://joboppjarrar.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://joboppjarrar.com"),
   title: {
     default: "Job Opp Jarrar - Overseas Job Opportunities",
     template: "%s | Job Opp Jarrar",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: "Job Opp Jarrar - Overseas Job Opportunities",
     description:
       "Find curated international job opportunities across construction, healthcare, hospitality, engineering, and more.",
-    url: "https://joboppjarrar.com",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://joboppjarrar.com",
   },
   twitter: {
     card: "summary_large_image",
