@@ -20,8 +20,9 @@ export async function generateMetadata({
   }
 
   const title = `${job.title} at ${job.company} - ${job.location}`;
+  const plainTextDescription = job.description.replace(/<[^>]+>/g, "");
   const description =
-    job.description.slice(0, 160).trimEnd() + (job.description.length > 160 ? "..." : "");
+    plainTextDescription.slice(0, 160).trimEnd() + (plainTextDescription.length > 160 ? "..." : "");
 
   return {
     title,
@@ -92,9 +93,10 @@ export default async function JobDetailPage({
 
           <div className="border-t border-stone-200 pt-10">
             <h2 className="text-2xl font-serif text-stone-900 mb-6">About the Role</h2>
-            <div className="prose prose-stone max-w-none text-stone-600 font-sans leading-relaxed whitespace-pre-wrap">
-              {job.description}
-            </div>
+            <div 
+              className="prose prose-stone max-w-none text-stone-600 font-sans leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: job.description }}
+            />
           </div>
 
           <div className="mt-12 lg:hidden">
