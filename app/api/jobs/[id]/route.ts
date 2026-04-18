@@ -15,7 +15,7 @@ export async function GET(
       where: { id },
     });
 
-    if (!job) {
+    if (!job || !job.isActive) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 

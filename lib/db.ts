@@ -1,14 +1,21 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaLibSQL } from "@prisma/adapter-libsql";
+import { PrismaLibSql } from "@prisma/adapter-libsql";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient() {
-  // In production (or whenever Turso env vars are set), use the LibSQL adapter
-  if (process.env.TURSO_DATABASE_URL && process.env.TURSO_AUTH_TOKEN) {
-    const adapter = new PrismaLibSQL({
+  const databaseUrl = process.env.DATABASE_URL ?? "";
+  const usingLocalSqlite = databaseUrl.startsWith("file:");
+
+  // Prefer the remote LibSQL adapter only when the app is not pointed at a local SQLite file.
+  if (
+    !usingLocalSqlite &&
+    process.env.TURSO_DATABASE_URL &&
+    process.env.TURSO_AUTH_TOKEN
+  ) {
+    const adapter = new PrismaLibSql({
       url: process.env.TURSO_DATABASE_URL,
       authToken: process.env.TURSO_AUTH_TOKEN,
     });

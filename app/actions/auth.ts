@@ -4,7 +4,11 @@ import { cookies } from "next/headers";
 
 export async function loginAdmin(formData: FormData) {
   const password = formData.get("password") as string;
-  const adminPassword = process.env.ADMIN_PASSWORD || "secret";
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminPassword) {
+    return { success: false, error: "ADMIN_PASSWORD is not configured." };
+  }
 
   if (password === adminPassword) {
     cookies().set("admin_token", "authenticated", {

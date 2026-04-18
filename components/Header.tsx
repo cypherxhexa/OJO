@@ -19,7 +19,8 @@ export function Header() {
     } else {
       params.delete("q");
     }
-    router.push(`/?${params.toString()}`);
+    const query = params.toString();
+    router.push(query ? `/?${query}` : "/");
   };
 
   return (

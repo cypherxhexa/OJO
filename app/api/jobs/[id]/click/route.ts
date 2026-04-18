@@ -11,6 +11,15 @@ export async function POST(
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
+    const job = await prisma.job.findUnique({
+      where: { id },
+      select: { id: true, isActive: true },
+    });
+
+    if (!job || !job.isActive) {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    }
+
     await prisma.job.update({
       where: { id },
       data: { clicks: { increment: 1 } },

@@ -3,19 +3,17 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Clear existing data
   await prisma.job.deleteMany();
   await prisma.siteSettings.deleteMany();
 
-  // Seed jobs
   await prisma.job.createMany({
     data: [
       {
         title: "Senior Software Engineer",
         company: "TechGlobal Solutions",
         location: "Dubai, UAE",
-        category: "Technology",
-        type: "Full-time",
+        category: "Tech",
+        type: "Full Time",
         salary: "$5,000 - $8,000/month",
         description:
           "We are looking for an experienced Software Engineer to join our development team in Dubai. You will be responsible for designing, developing, and maintaining scalable web applications. Requirements include 5+ years of experience with TypeScript, React, and Node.js. Competitive salary, housing allowance, and annual flight tickets included.",
@@ -28,7 +26,7 @@ async function main() {
         company: "Al Noor Hospital Group",
         location: "Riyadh, Saudi Arabia",
         category: "Healthcare",
-        type: "Full-time",
+        type: "Full Time",
         salary: "SAR 8,000 - 12,000/month",
         description:
           "Al Noor Hospital Group is hiring Registered Nurses for their Riyadh facilities. Candidates must hold a valid nursing license and have at least 2 years of clinical experience. Benefits include free accommodation, transportation, medical insurance, and 30 days paid leave.",
@@ -52,24 +50,22 @@ async function main() {
     ],
   });
 
-  // Seed site settings
   await prisma.siteSettings.createMany({
     data: [
-      { key: "site_name", value: "JobOpp Jarrar" },
-      { key: "site_description", value: "Find overseas job opportunities from trusted sources" },
-      { key: "header_ad_code", value: "" },
-      { key: "sidebar_ad_code", value: "" },
-      { key: "interstitial_ad_code", value: "" },
-      { key: "redirect_delay_seconds", value: "5" },
+      { key: "siteName", value: "Job Opp Jarrar" },
+      { key: "siteTagline", value: "Curated opportunities for global professionals." },
+      { key: "headerCode", value: "" },
+      { key: "homepageBannerAdCode", value: "" },
+      { key: "interstitialAdCode", value: "" },
     ],
   });
 
-  console.log("✅ Database seeded successfully!");
+  console.log("Database seeded successfully.");
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
+  .catch((error) => {
+    console.error(error);
     process.exit(1);
   })
   .finally(async () => {

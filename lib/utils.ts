@@ -25,5 +25,5 @@ export function formatDate(date: Date | string): string {
  */
 export function truncate(text: string, maxLength: number = 150): string {
   if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength).trimEnd() + "…";
+  return `${text.slice(0, maxLength).trimEnd()}...`;
 }

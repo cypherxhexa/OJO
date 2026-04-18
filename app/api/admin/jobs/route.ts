@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { cookies } from "next/headers";
+import { generateUniqueJobSlug, validateJobInput } from "@/lib/job";
 
 function isAuthorized() {
   const token = cookies().get("admin_token")?.value;
@@ -14,29 +15,29 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const slug =
-      body.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") +
-      "-" +
-      Math.floor(Math.random() * 10000);
+    const jobData = validateJobInput({
+      title: body.title,
+      company: body.company,
+      location: body.location,
+      salary: body.salary,
+      description: body.description,
+      category: body.category,
+      type: body.type || body.jobType,
+      externalUrl: body.externalUrl,
+      isActive: body.isActive ?? true,
+    });
+    const slug = await generateUniqueJobSlug(jobData.title);
 
     const job = await prisma.job.create({
-      data: {
-        title: body.title,
-        company: body.company,
-        location: body.location,
-        salary: body.salary || null,
-        description: body.description,
-        category: body.category,
-        type: body.type || body.jobType || "FULL_TIME",
-        externalUrl: body.externalUrl,
-        isActive: body.isActive ?? true,
-        slug,
-      },
+      data: { ...jobData, slug },
     });
 
     return NextResponse.json(job, { status: 201 });
   } catch (error) {
     console.error("Create job error:", error);
-    return NextResponse.json({ error: "Failed to create job" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to create job" },
+      { status: 400 }
+    );
   }
 }

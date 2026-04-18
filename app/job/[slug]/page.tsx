@@ -1,22 +1,27 @@
-import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { prisma } from "@/lib/db";
+import { notFound } from "next/navigation";
 import { AdSlot } from "@/components/AdSlot";
 import { JobPostingJsonLd } from "@/components/JobPostingJsonLd";
-import type { Metadata } from "next";
+import { prisma } from "@/lib/db";
 
 const SITE_NAME = "Job Opp Jarrar";
 const BASE_URL = "https://joboppjarrar.com";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
   const job = await prisma.job.findUnique({ where: { slug: params.slug } });
 
   if (!job) {
     return { title: "Job Not Found" };
   }
 
-  const title = `${job.title} at ${job.company} — ${job.location}`;
-  const description = job.description.slice(0, 160).trimEnd() + (job.description.length > 160 ? "…" : "");
+  const title = `${job.title} at ${job.company} - ${job.location}`;
+  const description =
+    job.description.slice(0, 160).trimEnd() + (job.description.length > 160 ? "..." : "");
 
   return {
     title,
@@ -36,7 +41,11 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function JobDetailPage({ params }: { params: { slug: string } }) {
+export default async function JobDetailPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const job = await prisma.job.findUnique({
     where: { slug: params.slug },
   });
@@ -45,10 +54,13 @@ export default async function JobDetailPage({ params }: { params: { slug: string
     notFound();
   }
 
-  // Fetch ad code from DB
   let adCode = "";
+
   try {
-    const setting = await prisma.siteSettings.findUnique({ where: { key: "interstitialAdCode" } });
+    const setting = await prisma.siteSettings.findUnique({
+      where: { key: "interstitialAdCode" },
+    });
+
     if (setting?.value) adCode = setting.value;
   } catch {}
 
@@ -56,11 +68,9 @@ export default async function JobDetailPage({ params }: { params: { slug: string
 
   return (
     <>
-      {/* JSON-LD Structured Data */}
       <JobPostingJsonLd job={job} url={jobUrl} />
 
       <div className="max-w-5xl mx-auto px-6 py-12 lg:py-20 flex flex-col lg:flex-row gap-12">
-        {/* Main Content */}
         <div className="flex-1 max-w-3xl">
           <header className="mb-10">
             <div className="flex items-center gap-3 text-sm text-stone-500 font-sans mb-4">
@@ -87,13 +97,11 @@ export default async function JobDetailPage({ params }: { params: { slug: string
             </div>
           </div>
 
-          {/* Mobile Banner Ad */}
           <div className="mt-12 lg:hidden">
             <AdSlot adCode={adCode || null} format="banner" />
           </div>
         </div>
 
-        {/* Sidebar Desktop */}
         <aside className="w-full lg:w-80 flex-shrink-0 flex flex-col gap-8">
           <div className="bg-stone-50 border border-stone-200 rounded-lg p-6 sticky top-24">
             <h3 className="font-serif text-xl text-stone-900 mb-2">Apply for this position</h3>
@@ -108,7 +116,6 @@ export default async function JobDetailPage({ params }: { params: { slug: string
             </Link>
           </div>
 
-          {/* Sidebar Desktop Ad */}
           <div className="hidden lg:block sticky top-[300px]">
             <AdSlot adCode={adCode || null} format="sidebar" />
           </div>

@@ -6,8 +6,9 @@ import Link from "next/link";
 import { Job } from "@prisma/client";
 import { AdSlot } from "@/components/AdSlot";
 import React from "react";
+import { JOB_CATEGORIES } from "@/lib/job-shared";
 
-const CATEGORIES = ["All", "Construction", "Healthcare", "Hospitality", "Engineering", "Tech"];
+const CATEGORIES = ["All", ...JOB_CATEGORIES];
 
 function JobCardSkeleton() {
   return (
@@ -51,9 +52,15 @@ export function JobGrid({ interstitialAdCode, defaultCategory }: { interstitialA
         
         const res = await fetch(`/api/jobs?${params.toString()}`);
         const data = await res.json();
+
+        if (!res.ok || !Array.isArray(data)) {
+          throw new Error("Failed to fetch jobs");
+        }
+
         setJobs(data);
       } catch (error) {
         console.error("Failed to fetch jobs", error);
+        setJobs([]);
       } finally {
         setLoading(false);
       }
@@ -69,7 +76,8 @@ export function JobGrid({ interstitialAdCode, defaultCategory }: { interstitialA
     } else {
       params.set("category", cat);
     }
-    router.push(`/?${params.toString()}`);
+    const query = params.toString();
+    router.push(query ? `/?${query}` : "/");
   };
 
   return (

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { cookies } from "next/headers";
+import { generateUniqueJobSlug, validateJobInput } from "@/lib/job";
 
 function isAuthorized() {
   const token = cookies().get("admin_token")?.value;
@@ -22,25 +23,31 @@ export async function PUT(
     }
 
     const body = await request.json();
+    const jobData = validateJobInput({
+      title: body.title,
+      company: body.company,
+      location: body.location,
+      salary: body.salary,
+      description: body.description,
+      category: body.category,
+      type: body.type || body.jobType,
+      externalUrl: body.externalUrl,
+      isActive: body.isActive ?? true,
+    });
+    const slug = await generateUniqueJobSlug(jobData.title, id);
+
     const job = await prisma.job.update({
       where: { id },
-      data: {
-        title: body.title,
-        company: body.company,
-        location: body.location,
-        salary: body.salary || null,
-        description: body.description,
-        category: body.category,
-        type: body.type || body.jobType || "FULL_TIME",
-        externalUrl: body.externalUrl,
-        isActive: body.isActive ?? true,
-      },
+      data: { ...jobData, slug },
     });
 
     return NextResponse.json(job);
   } catch (error) {
     console.error("Update job error:", error);
-    return NextResponse.json({ error: "Failed to update job" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Failed to update job" },
+      { status: 400 }
+    );
   }
 }
 

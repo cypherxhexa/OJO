@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createJob, updateJob } from "@/app/actions/adminJobs";
+import { JOB_CATEGORIES, JOB_TYPES } from "@/lib/job-shared";
 
 import { Job } from "@prisma/client";
 
@@ -55,23 +56,22 @@ export default function JobForm({ initialData }: { initialData?: Partial<Job> | 
         </div>
         <div>
           <label className="block text-sm font-medium text-stone-700 mb-1">Category *</label>
-          <select required name="category" defaultValue={initialData?.category || "ENGINEERING"} className="w-full border border-stone-300 rounded px-3 py-2 bg-white">
-            <option value="ENGINEERING">Engineering</option>
-            <option value="DESIGN">Design</option>
-            <option value="PRODUCT">Product</option>
-            <option value="MARKETING">Marketing</option>
-            <option value="SALES">Sales</option>
-            <option value="OTHER">Other</option>
+          <select required name="category" defaultValue={initialData?.category || "Engineering"} className="w-full border border-stone-300 rounded px-3 py-2 bg-white">
+            {JOB_CATEGORIES.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
           </select>
         </div>
         <div>
           <label className="block text-sm font-medium text-stone-700 mb-1">Job Type *</label>
-          <select required name="jobType" defaultValue={initialData?.type || "FULL_TIME"} className="w-full border border-stone-300 rounded px-3 py-2 bg-white">
-            <option value="FULL_TIME">Full Time</option>
-            <option value="PART_TIME">Part Time</option>
-            <option value="CONTRACT">Contract</option>
-            <option value="FREELANCE">Freelance</option>
-            <option value="INTERNSHIP">Internship</option>
+          <select required name="jobType" defaultValue={initialData?.type || "Full Time"} className="w-full border border-stone-300 rounded px-3 py-2 bg-white">
+            {JOB_TYPES.map((jobType) => (
+              <option key={jobType} value={jobType}>
+                {jobType}
+              </option>
+            ))}
           </select>
         </div>
       </div>

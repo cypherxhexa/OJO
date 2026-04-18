@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Lora, DM_Sans } from "next/font/google";
-import "./globals.css";
 import Script from "next/script";
+import { prisma } from "@/lib/db";
+import "./globals.css";
 
 const lora = Lora({ subsets: ["latin"], variable: "--font-lora" });
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
@@ -9,7 +10,7 @@ const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
 export const metadata: Metadata = {
   metadataBase: new URL("https://joboppjarrar.com"),
   title: {
-    default: "Job Opp Jarrar — Overseas Job Opportunities",
+    default: "Job Opp Jarrar - Overseas Job Opportunities",
     template: "%s | Job Opp Jarrar",
   },
   description:
@@ -17,14 +18,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Job Opp Jarrar",
-    title: "Job Opp Jarrar — Overseas Job Opportunities",
+    title: "Job Opp Jarrar - Overseas Job Opportunities",
     description:
       "Find curated international job opportunities across construction, healthcare, hospitality, engineering, and more.",
     url: "https://joboppjarrar.com",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Job Opp Jarrar — Overseas Job Opportunities",
+    title: "Job Opp Jarrar - Overseas Job Opportunities",
     description:
       "Curated international job opportunities for global professionals.",
   },
@@ -34,21 +35,23 @@ export const metadata: Metadata = {
   },
 };
 
-import { prisma } from "@/lib/db";
-
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   let headerCode = "";
+
   try {
-    const headerSetting = await prisma.siteSettings.findUnique({ where: { key: "headerCode" } });
+    const headerSetting = await prisma.siteSettings.findUnique({
+      where: { key: "headerCode" },
+    });
+
     if (headerSetting?.value) {
       headerCode = headerSetting.value;
     }
   } catch {
-    // Suppress error during build or if DB is down
+    // Ignore DB errors during build/startup and render without custom head code.
   }
 
   return (

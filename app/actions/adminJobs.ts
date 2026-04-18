@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db";
+import { generateUniqueJobSlug, parseJobFormData } from "@/lib/job";
 import { revalidatePath } from "next/cache";
 
 export async function deleteJob(id: number) {
@@ -17,48 +18,33 @@ export async function deleteJob(id: number) {
 
 export async function createJob(formData: FormData) {
   try {
-    const title = formData.get("title") as string;
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Math.floor(Math.random() * 1000);
-    
+    const jobData = parseJobFormData(formData);
+    const slug = await generateUniqueJobSlug(jobData.title);
+
     await prisma.job.create({
-      data: {
-        title,
-        company: formData.get("company") as string,
-        location: formData.get("location") as string,
-        salary: formData.get("salary") as string || null,
-        description: formData.get("description") as string,
-        category: formData.get("category") as string,
-        type: formData.get("jobType") as string,
-        externalUrl: formData.get("externalUrl") as string,
-        isActive: formData.get("isActive") === "on",
-        slug,
-      }
+      data: { ...jobData, slug },
     });
-    
+
     revalidatePath("/admin/jobs");
     revalidatePath("/");
     return { success: true };
   } catch (error) {
     console.error("Create job error:", error);
-    return { success: false, error: "Error creating job" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Error creating job",
+    };
   }
 }
 
 export async function updateJob(id: number, formData: FormData) {
   try {
+    const jobData = parseJobFormData(formData);
+    const slug = await generateUniqueJobSlug(jobData.title, id);
+
     await prisma.job.update({
       where: { id },
-      data: {
-        title: formData.get("title") as string,
-        company: formData.get("company") as string,
-        location: formData.get("location") as string,
-        salary: formData.get("salary") as string || null,
-        description: formData.get("description") as string,
-        category: formData.get("category") as string,
-        type: formData.get("jobType") as string,
-        externalUrl: formData.get("externalUrl") as string,
-        isActive: formData.get("isActive") === "on",
-      }
+      data: { ...jobData, slug },
     });
 
     revalidatePath("/admin/jobs");
@@ -66,6 +52,9 @@ export async function updateJob(id: number, formData: FormData) {
     return { success: true };
   } catch (error) {
     console.error("Update job error:", error);
-    return { success: false, error: "Error updating job" };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Error updating job",
+    };
   }
 }

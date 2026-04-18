@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AdSlot } from "@/components/AdSlot";
+import { isValidHttpUrl } from "@/lib/job-shared";
 
 export default function RedirectPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -27,6 +28,11 @@ export default function RedirectPage({ params }: { params: { id: string } }) {
         }
 
         const jobData = await jobRes.json();
+        if (!jobData.isActive || !isValidHttpUrl(jobData.externalUrl)) {
+          setError(true);
+          return;
+        }
+
         setTargetUrl(jobData.externalUrl);
         setCompany(jobData.company);
 

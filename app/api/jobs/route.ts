@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { JOB_CATEGORIES } from "@/lib/job-shared";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const q = searchParams.get("q") || searchParams.get("search") || "";
-  const category = searchParams.get("category") || "";
+  const q = (searchParams.get("q") || searchParams.get("search") || "").trim();
+  const category = (searchParams.get("category") || "").trim();
 
   const whereClause: Prisma.JobWhereInput = {
     isActive: true,
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
     ];
   }
 
-  if (category && category !== "All") {
+  if (category && category !== "All" && JOB_CATEGORIES.includes(category as (typeof JOB_CATEGORIES)[number])) {
     whereClause.category = { equals: category };
   }
 
