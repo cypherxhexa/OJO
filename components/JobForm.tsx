@@ -13,8 +13,8 @@ import "react-quill/dist/quill.snow.css";
 // We need to dynamically import ReactQuill to prevent SSR window errors in Next.js
 const ReactQuill = dynamic(
   async () => {
-    const { default: RQ } = await import("react-quill");
-    return function ForwardedQuill(props: Record<string, unknown>) { return <RQ {...(props as any)} />; };
+    const mod = await import("react-quill");
+    return mod.default;
   },
   {
     ssr: false,
