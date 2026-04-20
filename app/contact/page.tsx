@@ -12,8 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function ContactPage() {
-  const contactEmail = process.env.CONTACT_EMAIL;
-  if (!contactEmail) throw new Error("CONTACT_EMAIL environment variable is missing");
+  const contactEmail = process.env.CONTACT_EMAIL || "admin@joboppjarrar.com";
 
   return (
     <div className="min-h-screen flex flex-col">

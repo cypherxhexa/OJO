@@ -15,8 +15,7 @@ import { prisma } from "@/lib/db";
 // ──────────────────────────────────────────────────────────────────────────────
 
 const SITE_NAME = "Job Opp Jarrar";
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL;
-if (!BASE_URL) throw new Error("NEXT_PUBLIC_SITE_URL environment variable is missing");
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://joboppjarrar.com";
 
 export async function generateMetadata({
   params,

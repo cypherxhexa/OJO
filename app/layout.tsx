@@ -8,8 +8,7 @@ import "./globals.css";
 const lora = Lora({ subsets: ["latin"], variable: "--font-lora" });
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
-if (!SITE_URL) throw new Error("NEXT_PUBLIC_SITE_URL environment variable is missing");
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://joboppjarrar.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

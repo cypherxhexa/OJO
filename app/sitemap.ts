@@ -2,8 +2,7 @@ import { MetadataRoute } from "next";
 import { prisma } from "@/lib/db";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  if (!baseUrl) throw new Error("NEXT_PUBLIC_SITE_URL environment variable is missing");
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://joboppjarrar.com";
 
   // Get all active jobs
   const jobs = await prisma.job.findMany({
