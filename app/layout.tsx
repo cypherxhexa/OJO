@@ -2,13 +2,17 @@ import type { Metadata } from "next";
 import { Lora, DM_Sans } from "next/font/google";
 import Script from "next/script";
 import { prisma } from "@/lib/db";
+import { AdsenseScript } from "@/components/AdsenseScript";
 import "./globals.css";
 
 const lora = Lora({ subsets: ["latin"], variable: "--font-lora" });
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL;
+if (!SITE_URL) throw new Error("NEXT_PUBLIC_SITE_URL environment variable is missing");
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://joboppjarrar.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Job Opp Jarrar - Overseas Job Opportunities",
     template: "%s | Job Opp Jarrar",
@@ -21,7 +25,7 @@ export const metadata: Metadata = {
     title: "Job Opp Jarrar - Overseas Job Opportunities",
     description:
       "Find curated international job opportunities across construction, healthcare, hospitality, engineering, and more.",
-    url: process.env.NEXT_PUBLIC_SITE_URL || "https://joboppjarrar.com",
+    url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
@@ -56,6 +60,10 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={`${lora.variable} ${dmSans.variable}`}>
+      <head>
+        {/* AdSense script — only renders when NEXT_PUBLIC_ADSENSE_CLIENT is set */}
+        <AdsenseScript />
+      </head>
       <body className="bg-stone-50 text-stone-900 font-sans antialiased selection:bg-amber-700 selection:text-white">
         {children}
         {headerCode && (

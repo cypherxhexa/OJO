@@ -44,6 +44,9 @@ export async function PUT(
     return NextResponse.json(job);
   } catch (error) {
     console.error("Update job error:", error);
+    if (error && typeof error === "object" && "code" in error && (error as Record<string, unknown>).code === "P2025") {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    }
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to update job" },
       { status: 400 }
@@ -69,6 +72,9 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete job error:", error);
+    if (error && typeof error === "object" && "code" in error && (error as Record<string, unknown>).code === "P2025") {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    }
     return NextResponse.json({ error: "Failed to delete job" }, { status: 500 });
   }
 }

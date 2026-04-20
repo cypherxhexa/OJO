@@ -10,3 +10,81 @@
     font-family: var(--font-lora), Georgia, serif;
   }
 }
+
+/* Blog article prose styles */
+.prose h2 {
+  @apply text-2xl font-bold mt-10 mb-4 pb-2 border-b border-stone-200;
+}
+
+.prose h3 {
+  @apply text-xl font-bold mt-8 mb-3;
+}
+
+.prose h4 {
+  @apply text-lg font-bold mt-6 mb-2;
+}
+
+.prose p {
+  @apply mb-5 leading-relaxed;
+}
+
+.prose ul, .prose ol {
+  @apply mb-5 pl-6;
+}
+
+.prose ul {
+  @apply list-disc;
+}
+
+.prose ol {
+  @apply list-decimal;
+}
+
+.prose li {
+  @apply mb-2 leading-relaxed;
+}
+
+.prose a {
+  @apply text-amber-700 underline hover:text-amber-900 transition-colors;
+}
+
+.prose strong {
+  @apply font-bold text-stone-900;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-amber-700 pl-5 italic text-stone-600 my-6;
+}
+
+.prose img {
+  @apply max-w-full rounded my-6;
+}
+
+/* Blog editor fixes (ReactQuill in admin) */
+.blog-editor .ql-container {
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  font-size: 1rem;
+  min-height: 300px;
+}
+
+.blog-editor .ql-editor {
+  min-height: 300px;
+  line-height: 1.7;
+}
+
+.blog-editor .ql-toolbar {
+  border-color: #d6d3d1 !important;
+  border-bottom-color: #e7e5e4 !important;
+}
+
+.blog-editor .ql-container {
+  border-color: #d6d3d1 !important;
+}
+
+/* line-clamp utility for blog card excerpts */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

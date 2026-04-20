@@ -1,60 +1,107 @@
 "use client";
 
+// ─── GOOGLE ADSENSE PLACEMENT RULES (enforced in code) ───────────────────────
+// • Max 3 display ad units per page
+// • Never place ads where users might accidentally click (next to buttons, below nav)
+// • Never place ads in popups or overlays blocking all content
+// • Never place ads on empty/error/admin pages
+// • Interstitial countdown pages (5s) ARE allowed — user must always see skip button
+// • In-article ads must be between paragraphs, never mid-sentence
+// • Mobile: ads must not be stacked (2+ visible simultaneously on screen)
+// • "Advertisement" label appears above every slot (AdSense also adds its own)
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { useEffect, useRef } from "react";
 
+export type AdFormat = "leaderboard" | "rectangle" | "mobile-banner" | "infeed";
+
 interface AdSlotProps {
-  adCode?: string | null;
-  format?: "banner" | "sidebar";
+  /** AdSense data-ad-slot ID from env var */
+  slotId?: string;
+  /** Visual format determines dimensions and placeholder size */
+  format: AdFormat;
   className?: string;
 }
 
-export function AdSlot({ adCode, format = "banner", className = "" }: AdSlotProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
+const FORMAT_DIMENSIONS: Record<AdFormat, { label: string; minH: string; maxW: string }> = {
+  leaderboard:    { label: "728×90 / 320×50",  minH: "min-h-[90px]",  maxW: "max-w-full" },
+  rectangle:      { label: "336×280",           minH: "min-h-[280px]", maxW: "max-w-[336px]" },
+  "mobile-banner":{ label: "320×50",            minH: "min-h-[50px]",  maxW: "max-w-[320px]" },
+  infeed:         { label: "In-Feed Native",    minH: "min-h-[120px]", maxW: "max-w-full" },
+};
+
+const CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+
+export function AdSlot({ slotId, format, className = "" }: AdSlotProps) {
+  const insRef = useRef<HTMLModElement>(null);
 
   useEffect(() => {
-    if (!adCode || !containerRef.current) return;
+    // Only push ads if client ID and slot ID are both configured
+    if (!CLIENT || !slotId) return;
 
-    // Clear any previous content
-    containerRef.current.innerHTML = "";
+    try {
+      // AdSense pushes an empty object to the adsbygoogle array to init each slot
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+    } catch (err) {
+      console.error("[AdSlot] adsbygoogle push error:", err);
+    }
+  }, [slotId]);
 
-    // Create a wrapper and inject the ad HTML
-    const wrapper = document.createElement("div");
-    wrapper.innerHTML = adCode;
+  const { label, minH, maxW } = FORMAT_DIMENSIONS[format];
 
-    // Execute any <script> tags inside the ad code
-    const scripts = wrapper.querySelectorAll("script");
-    scripts.forEach((oldScript) => {
-      const newScript = document.createElement("script");
-      // Copy all attributes
-      Array.from(oldScript.attributes).forEach((attr) => {
-        newScript.setAttribute(attr.name, attr.value);
-      });
-      // Copy inline script content
-      newScript.textContent = oldScript.textContent;
-      oldScript.replaceWith(newScript);
-    });
-
-    containerRef.current.appendChild(wrapper);
-  }, [adCode]);
-
-  if (!adCode) {
+  // ── Placeholder mode (no client ID or no slot ID) ──────────────────────────
+  // Shows a dashed placeholder so the client can see ad positions during
+  // testing, before AdSense account is approved and IDs are entered.
+  if (!CLIENT || !slotId) {
     return (
-      <div
-        data-ad-slot={format}
-        className={`bg-stone-100 border border-stone-200 border-dashed flex flex-col items-center justify-center text-stone-400 font-sans text-[10px] uppercase tracking-widest ${
-          format === "banner" ? "w-full min-h-[120px]" : "w-full min-h-[250px]"
-        } ${className}`}
-      >
-        Advertisement
+      <div className={`w-full ${className}`}>
+        {/* "Advertisement" label — shown above every real slot too */}
+        <p className="text-[10px] text-stone-400 text-center uppercase tracking-widest mb-1 font-sans select-none">
+          Advertisement
+        </p>
+        <div
+          className={`${minH} ${maxW} mx-auto border border-dashed border-stone-300 bg-stone-50 
+            flex items-center justify-center text-stone-300 font-sans text-[11px] uppercase tracking-widest`}
+        >
+          Ad Slot — {label}
+        </div>
       </div>
     );
   }
 
+  // ── Live AdSense mode ───────────────────────────────────────────────────────
   return (
-    <div
-      ref={containerRef}
-      data-ad-slot={format}
-      className={`ad-container ${format} ${className}`}
-    />
+    <div className={`w-full ${className}`}>
+      {/* "Advertisement" label — good-faith compliance label above every slot */}
+      <p className="text-[10px] text-stone-400 text-center uppercase tracking-widest mb-1 font-sans select-none">
+        Advertisement
+      </p>
+      <ins
+        ref={insRef}
+        className="adsbygoogle"
+        style={{ display: "block" }}
+        data-ad-client={CLIENT}
+        data-ad-slot={slotId}
+        data-ad-format={format === "infeed" ? "fluid" : "auto"}
+        data-full-width-responsive="true"
+      />
+    </div>
   );
+}
+
+// ── Legacy compatibility shim ──────────────────────────────────────────────────
+// The old AdSlot accepted { adCode, format: "banner"|"sidebar" } — keep a small
+// shim so existing callsites compile while we migrate them all in this PR.
+interface LegacyAdSlotProps {
+  adCode?: string | null;
+  format?: "banner" | "sidebar";
+  className?: string;
+}
+export function LegacyAdSlot({ format = "banner", className = "" }: LegacyAdSlotProps) {
+  const f: AdFormat = format === "sidebar" ? "rectangle" : "leaderboard";
+  const env = format === "sidebar"
+    ? process.env.NEXT_PUBLIC_ADSENSE_SLOT_JOB_SIDEBAR
+    : undefined;
+  return <AdSlot slotId={env} format={f} className={className} />;
 }

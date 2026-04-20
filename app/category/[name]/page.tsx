@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { JobGrid } from "@/components/JobGrid";
-import { prisma } from "@/lib/db";
 
 const CATEGORY_LABELS: Record<string, string> = {
   construction: "Construction",
@@ -41,15 +40,6 @@ export default async function CategoryPage({
   params: { name: string };
 }) {
   const label = CATEGORY_LABELS[params.name.toLowerCase()] || params.name;
-  let interstitialAdCode = "";
-
-  try {
-    const setting = await prisma.siteSettings.findUnique({
-      where: { key: "interstitialAdCode" },
-    });
-
-    if (setting?.value) interstitialAdCode = setting.value;
-  } catch {}
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -80,7 +70,7 @@ export default async function CategoryPage({
               </div>
             }
           >
-            <JobGrid interstitialAdCode={interstitialAdCode} defaultCategory={label} />
+            <JobGrid defaultCategory={label} />
           </Suspense>
         </section>
       </main>

@@ -7,7 +7,7 @@ export async function loginAdmin(formData: FormData) {
   const adminPassword = process.env.ADMIN_PASSWORD;
 
   if (!adminPassword) {
-    return { success: false, error: "ADMIN_PASSWORD is not configured." };
+    throw new Error("ADMIN_PASSWORD is not configured in the environment.");
   }
 
   if (password === adminPassword) {
@@ -21,7 +21,7 @@ export async function loginAdmin(formData: FormData) {
     return { success: true };
   }
 
-  return { success: false, error: "Invalid password" };
+  return { success: false, error: "Invalid credentials" };
 }
 
 export async function logoutAdmin() {

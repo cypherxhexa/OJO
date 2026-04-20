@@ -13,6 +13,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <nav className="flex flex-col gap-2 px-4 py-2 font-sans text-sm flex-1">
           <Link href="/admin" className="px-4 py-2 hover:bg-stone-800 rounded transition-colors">Dashboard</Link>
           <Link href="/admin/jobs" className="px-4 py-2 hover:bg-stone-800 rounded transition-colors">Manage Jobs</Link>
+          <Link href="/admin/messages" className="px-4 py-2 hover:bg-stone-800 rounded transition-colors">Messages</Link>
+          <Link href="/admin/blog" className="px-4 py-2 hover:bg-stone-800 rounded transition-colors">Blog</Link>
           <Link href="/admin/settings" className="px-4 py-2 hover:bg-stone-800 rounded transition-colors">Settings</Link>
         </nav>
         <div className="p-4 border-t border-stone-800 text-sm font-sans flex flex-col gap-2">

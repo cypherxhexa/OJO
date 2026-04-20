@@ -28,3 +28,35 @@ model SiteSettings {
   key   String @id
   value String
 }
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model BlogCategory {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  slug String @unique
+}
+
+model BlogPost {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  excerpt     String
+  content     String   @default("")
+  coverImage  String?
+  category    String
+  authorName  String   @default("Editorial Team")
+  isPublished Boolean  @default(false)
+  isFeatured  Boolean  @default(false)
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

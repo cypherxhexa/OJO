@@ -33,7 +33,7 @@ function JobCardSkeleton() {
   );
 }
 
-export function JobGrid({ interstitialAdCode, defaultCategory }: { interstitialAdCode?: string; defaultCategory?: string }) {
+export function JobGrid({ defaultCategory }: { defaultCategory?: string }) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
@@ -131,56 +131,56 @@ export function JobGrid({ interstitialAdCode, defaultCategory }: { interstitialA
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {jobs.map((job, index) => (
             <React.Fragment key={job.id}>
-              {index > 0 && index % 6 === 0 && (
-                <div className="col-span-full my-6">
-                  <AdSlot adCode={interstitialAdCode || null} format="banner" />
+              {index > 0 && index % 8 === 0 && (
+                <div className="col-span-full my-4">
+                  <AdSlot slotId={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_INFEED} format="infeed" />
                 </div>
               )}
-            <div 
-              className="group flex flex-col bg-white border border-stone-200 p-6 hover:border-amber-700 transition-colors rounded-none"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <span className="px-2 py-0.5 bg-stone-100 text-xs font-semibold text-stone-600 uppercase tracking-widest border border-stone-200">
-                  {job.type || "Full-Time"}
-                </span>
-                <span className="text-xs text-stone-400 font-medium font-sans">
-                  {new Date(job.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                </span>
-              </div>
-              
-              <h3 className="font-serif text-xl font-bold text-stone-900 mb-1 leading-tight group-hover:text-amber-800 transition-colors line-clamp-2">
-                {job.title}
-              </h3>
-              
-              <p className="text-sm font-medium text-stone-600 mb-4 line-clamp-1">
-                {job.company}
-              </p>
-
-              <div className="mt-auto space-y-4">
-                <div className="flex items-center text-sm text-stone-500">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                  {job.location}
+              <div 
+                className="group flex flex-col bg-white border border-stone-200 p-6 hover:border-amber-700 transition-colors rounded-none"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <span className="px-2 py-0.5 bg-stone-100 text-xs font-semibold text-stone-600 uppercase tracking-widest border border-stone-200">
+                    {job.type || "Full-Time"}
+                  </span>
+                  <span className="text-xs text-stone-400 font-medium font-sans">
+                    {new Date(job.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  </span>
                 </div>
+                
+                <h3 className="font-serif text-xl font-bold text-stone-900 mb-1 leading-tight group-hover:text-amber-800 transition-colors line-clamp-2">
+                  {job.title}
+                </h3>
+                
+                <p className="text-sm font-medium text-stone-600 mb-4 line-clamp-1">
+                  {job.company}
+                </p>
 
-                <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
-                  <span className="text-sm font-bold text-stone-900">{job.salary || "Competitive"}</span>
-                  <div className="flex gap-2">
-                    <Link 
-                      href={`/job/${job.slug}`}
-                      className="inline-flex items-center justify-center bg-stone-100 text-stone-900 px-3 py-2 text-xs font-semibold hover:bg-stone-200 transition-colors border border-stone-300"
-                    >
-                      Details
-                    </Link>
-                    <Link 
-                      href={`/redirect/${job.id}`}
-                      className="inline-flex items-center justify-center bg-stone-900 text-stone-50 px-4 py-2 text-xs font-semibold hover:bg-amber-700 transition-colors border border-stone-900"
-                    >
-                      Apply Now
-                    </Link>
+                <div className="mt-auto space-y-4">
+                  <div className="flex items-center text-sm text-stone-500">
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    {job.location}
+                  </div>
+
+                  <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
+                    <span className="text-sm font-bold text-stone-900">{job.salary || "Competitive"}</span>
+                    <div className="flex gap-2">
+                      <Link 
+                        href={`/job/${job.slug}`}
+                        className="inline-flex items-center justify-center bg-stone-100 text-stone-900 px-3 py-2 text-xs font-semibold hover:bg-stone-200 transition-colors border border-stone-300"
+                      >
+                        Details
+                      </Link>
+                      <Link 
+                        href={`/redirect/${job.id}`}
+                        className="inline-flex items-center justify-center bg-stone-900 text-stone-50 px-4 py-2 text-xs font-semibold hover:bg-amber-700 transition-colors border border-stone-900"
+                      >
+                        Apply Now
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             </React.Fragment>
           ))}
         </div>
