@@ -54,7 +54,21 @@ async function main() {
     await client.execute(`CREATE UNIQUE INDEX IF NOT EXISTS "BlogPost_slug_key" ON "BlogPost"("slug")`);
     console.log("  ✓ BlogPost indexes");
 
-    console.log("✅ Blog tables pushed to Turso!");
+    // Create ContactMessage table
+    await client.execute(`
+      CREATE TABLE IF NOT EXISTS "ContactMessage" (
+        "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        "name" TEXT NOT NULL,
+        "email" TEXT NOT NULL,
+        "subject" TEXT NOT NULL,
+        "message" TEXT NOT NULL,
+        "isRead" BOOLEAN NOT NULL DEFAULT false,
+        "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log("  ✓ ContactMessage table");
+
+    console.log("✅ All tables pushed to Turso!");
     process.exit(0);
   } catch (error) {
     console.error("❌ Error:", error);
