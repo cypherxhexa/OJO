@@ -1,17 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { cookies } from "next/headers";
-
-function isAuthorized() {
-  const token = cookies().get("admin_token")?.value;
-  return token === "authenticated";
-}
+import { isAdminAuthorized } from "@/lib/adminAuth";
 
 export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } }
 ) {
-  if (!isAuthorized()) {
+  if (!isAdminAuthorized()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

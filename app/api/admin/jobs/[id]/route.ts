@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { cookies } from "next/headers";
+import { isAdminAuthorized } from "@/lib/adminAuth";
 import { generateUniqueJobSlug, validateJobInput } from "@/lib/job";
-
-function isAuthorized() {
-  const token = cookies().get("admin_token")?.value;
-  return token === "authenticated";
-}
 
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  if (!isAuthorized()) {
+  if (!isAdminAuthorized()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -58,7 +53,7 @@ export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } }
 ) {
-  if (!isAuthorized()) {
+  if (!isAdminAuthorized()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

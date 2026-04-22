@@ -3,13 +3,13 @@ import { prisma } from "@/lib/db";
 import { cookies } from "next/headers";
 import { slugify } from "@/lib/utils";
 
-function isAuthorized() {
+function isAdminAuthorized() {
   const token = cookies().get("admin_token")?.value;
   return token === "authenticated";
 }
 
 export async function GET() {
-  if (!isAuthorized()) {
+  if (!isAdminAuthorized()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -18,7 +18,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!isAuthorized()) {
+  if (!isAdminAuthorized()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
