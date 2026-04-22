@@ -11,7 +11,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import { estimateReadTime, stripHtml } from "@/lib/blog";
 import { splitContentAtParagraph } from "@/lib/adUtils";
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 import Image from "next/image";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://joboppjarrar.com";
@@ -93,8 +93,16 @@ export default async function BlogPostPage({
   const readTime = estimateReadTime(post.content);
   const postUrl = `${BASE_URL}/blog/${post.slug}`;
   const parts = splitContentAtParagraph(post.content, 3);
-  const contentPart1 = DOMPurify.sanitize(parts[0]);
-  const contentPart2 = DOMPurify.sanitize(parts[1]);
+  const sanitizeOptions = {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2"]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      img: ["src", "alt", "width", "height", "class", "style"],
+      "*": ["class", "style", "id"],
+    },
+  };
+  const contentPart1 = sanitizeHtml(parts[0], sanitizeOptions);
+  const contentPart2 = sanitizeHtml(parts[1], sanitizeOptions);
 
   return (
     <div className="min-h-screen flex flex-col">
