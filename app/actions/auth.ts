@@ -32,16 +32,7 @@ function buildSignedCookieValue(raw: string): string {
   return `${raw}.${signToken(raw)}`;
 }
 
-/** Verify a `<raw>.<sig>` cookie value. Returns true if valid. */
-export function verifySignedCookie(value: string): boolean {
-  const lastDot = value.lastIndexOf(".");
-  if (lastDot === -1) return false;
-  const raw = value.slice(0, lastDot);
-  const sig = value.slice(lastDot + 1);
-  const expected = signToken(raw);
-  // Constant-time comparison via length check + HMAC re-sign
-  return sig.length === expected.length && sig === expected;
-}
+
 
 function getClientIp(): string {
   const hdrs = headers();
