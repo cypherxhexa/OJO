@@ -1,18 +1,17 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createHmac } from 'crypto';
 
 /**
  * Verify a `<raw>.<sig>` admin_token cookie value.
  *
- * The login action (app/actions/auth.ts) generates:
- *   raw  = crypto.randomBytes(32).toString('hex')
- *   sig  = HMAC-SHA256(raw, ADMIN_SECRET)
- *   cookie value = `${raw}.${sig}`
+ * Uses the Web Crypto API (crypto.subtle) — the ONLY crypto available
+ * in the Edge runtime. Node's `crypto` module is NOT available here.
  *
- * We re-derive the HMAC here and compare — no DB call, safe for Edge runtime.
+ * The login action (app/actions/auth.ts) signs with Node's createHmac
+ * using HMAC-SHA256 over UTF-8 encoded data — this produces the same
+ * output as crypto.subtle with the same inputs.
  */
-function verifyToken(value: string): boolean {
+async function verifyToken(value: string): Promise<boolean> {
   const secret = process.env.ADMIN_SECRET || process.env.ADMIN_PASSWORD;
   if (!secret) return false;
 
@@ -21,15 +20,36 @@ function verifyToken(value: string): boolean {
 
   const raw = value.slice(0, lastDot);
   const sig = value.slice(lastDot + 1);
-  const expected = createHmac('sha256', secret).update(raw).digest('hex');
 
-  // Length check + comparison (not constant-time in JS, but adequate for this threat model)
+  const encoder = new TextEncoder();
+
+  // Import the HMAC key from the secret
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  // Sign the raw token with the same key
+  const signatureBuffer = await crypto.subtle.sign(
+    'HMAC',
+    key,
+    encoder.encode(raw)
+  );
+
+  // Convert ArrayBuffer → hex string (same format as Node's .digest('hex'))
+  const expected = Array.from(new Uint8Array(signatureBuffer))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+
   return sig.length === expected.length && sig === expected;
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const tokenValue = request.cookies.get('admin_token')?.value ?? '';
-  const isAuthenticated = tokenValue ? verifyToken(tokenValue) : false;
+  const isAuthenticated = tokenValue ? await verifyToken(tokenValue) : false;
   const path = request.nextUrl.pathname;
 
   // Protect /admin/* pages (except login)
