@@ -72,8 +72,9 @@ export default function BlogPostForm({ mode, postId, initialData }: BlogPostForm
   const fetchCategories = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/blog/categories");
+      if (!res.ok) return; // silently skip — admin is not logged in or API is down
       const data = await res.json();
-      setCategories(data);
+      if (Array.isArray(data)) setCategories(data);
     } catch (e) {
       console.error(e);
     }

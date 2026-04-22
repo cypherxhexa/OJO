@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { cookies } from "next/headers";
+import { isAdminAuthorized } from "@/lib/adminAuth";
 import { slugify } from "@/lib/utils";
-
-function isAdminAuthorized() {
-  const token = cookies().get("admin_token")?.value;
-  return token === "authenticated";
-}
 
 export async function GET() {
   if (!isAdminAuthorized()) {

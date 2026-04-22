@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { cookies } from "next/headers";
+import { isAdminAuthorized } from "@/lib/adminAuth";
 import { generateUniqueJobSlug, validateJobInput } from "@/lib/job";
-
-function isAdminAuthorized() {
-  const token = cookies().get("admin_token")?.value;
-  return token === "authenticated";
-}
 
 export async function POST(request: Request) {
   if (!isAdminAuthorized()) {

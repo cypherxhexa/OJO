@@ -18,8 +18,9 @@ export default function AdminBlogCategoriesPage() {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/blog/categories");
+      if (!res.ok) return;
       const data = await res.json();
-      setCategories(data);
+      if (Array.isArray(data)) setCategories(data);
     } catch (e) {
       console.error(e);
     } finally {
