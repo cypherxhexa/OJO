@@ -11,7 +11,7 @@
 // • "Advertisement" label appears above every slot (AdSense also adds its own)
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 export type AdFormat = "leaderboard" | "rectangle" | "mobile-banner" | "infeed";
 
@@ -33,8 +33,6 @@ const FORMAT_DIMENSIONS: Record<AdFormat, { label: string; minH: string; maxW: s
 const CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
 export function AdSlot({ slotId, format, className = "" }: AdSlotProps) {
-  const insRef = useRef<HTMLModElement>(null);
-
   useEffect(() => {
     // Only push ads if client ID and slot ID are both configured
     if (!CLIENT || !slotId) return;
@@ -78,7 +76,6 @@ export function AdSlot({ slotId, format, className = "" }: AdSlotProps) {
         Advertisement
       </p>
       <ins
-        ref={insRef}
         className="adsbygoogle"
         style={{ display: "block" }}
         data-ad-client={CLIENT}
@@ -90,18 +87,3 @@ export function AdSlot({ slotId, format, className = "" }: AdSlotProps) {
   );
 }
 
-// ── Legacy compatibility shim ──────────────────────────────────────────────────
-// The old AdSlot accepted { adCode, format: "banner"|"sidebar" } — keep a small
-// shim so existing callsites compile while we migrate them all in this PR.
-interface LegacyAdSlotProps {
-  adCode?: string | null;
-  format?: "banner" | "sidebar";
-  className?: string;
-}
-export function LegacyAdSlot({ format = "banner", className = "" }: LegacyAdSlotProps) {
-  const f: AdFormat = format === "sidebar" ? "rectangle" : "leaderboard";
-  const env = format === "sidebar"
-    ? process.env.NEXT_PUBLIC_ADSENSE_SLOT_JOB_SIDEBAR
-    : undefined;
-  return <AdSlot slotId={env} format={f} className={className} />;
-}

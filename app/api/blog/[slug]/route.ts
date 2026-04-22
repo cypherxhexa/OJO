@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const post = await prisma.blogPost.findUnique({
+    const post = await prisma.blogPost.findFirst({
       where: { slug: params.slug, isPublished: true },
     });
 
@@ -14,13 +14,9 @@ export async function GET(
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    // Increment views
-    await prisma.blogPost.update({
-      where: { id: post.id },
-      data: { views: { increment: 1 } },
-    });
-
-    return NextResponse.json({ ...post, views: post.views + 1 });
+    // View count is incremented in the page server component (app/blog/[slug]/page.tsx).
+    // This API route returns data only — no side effects.
+    return NextResponse.json(post);
   } catch (error) {
     console.error("Blog post error:", error);
     return NextResponse.json({ error: "Failed to fetch post" }, { status: 500 });

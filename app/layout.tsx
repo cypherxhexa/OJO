@@ -3,6 +3,7 @@ import { Lora, DM_Sans } from "next/font/google";
 import Script from "next/script";
 import { prisma } from "@/lib/db";
 import { AdsenseScript } from "@/components/AdsenseScript";
+import { validateHeaderCode } from "@/lib/headerCodeValidator";
 import "./globals.css";
 
 const lora = Lora({ subsets: ["latin"], variable: "--font-lora" });
@@ -51,7 +52,13 @@ export default async function RootLayout({
     });
 
     if (headerSetting?.value) {
-      headerCode = headerSetting.value;
+      // Only inject if the code passes domain validation — prevents stored XSS
+      const validationError = validateHeaderCode(headerSetting.value);
+      if (!validationError) {
+        headerCode = headerSetting.value;
+      } else {
+        console.warn("[layout] headerCode blocked by validator:", validationError);
+      }
     }
   } catch {
     // Ignore DB errors during build/startup and render without custom head code.
