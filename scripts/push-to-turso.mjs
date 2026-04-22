@@ -68,6 +68,15 @@ async function main() {
     `);
     console.log("  ✓ ContactMessage table");
 
+    // Add jobImages column to Job table (if not exists)
+    // SQLite doesn't support IF NOT EXISTS for columns so we catch the error
+    try {
+      await client.execute(`ALTER TABLE "Job" ADD COLUMN "jobImages" TEXT`);
+      console.log("  ✓ Added jobImages column to Job table");
+    } catch {
+      console.log("  ℹ jobImages column already exists on Job table");
+    }
+
     console.log("✅ All tables pushed to Turso!");
     process.exit(0);
   } catch (error) {

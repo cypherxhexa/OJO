@@ -18,6 +18,7 @@ export type JobInput = {
   description: string;
   externalUrl: string;
   isActive: boolean;
+  jobImages: string | null; // JSON array string
 };
 
 function readString(value: FormDataEntryValue | null) {
@@ -35,6 +36,7 @@ export function parseJobFormData(formData: FormData): JobInput {
     description: readString(formData.get("description")),
     externalUrl: readString(formData.get("externalUrl")),
     isActive: formData.get("isActive") === "on",
+    jobImages: readString(formData.get("jobImages")) || null,
   });
 }
 
@@ -48,6 +50,7 @@ export function validateJobInput(input: Partial<JobInput>): JobInput {
   const description = input.description?.trim() ?? "";
   const externalUrl = input.externalUrl?.trim() ?? "";
   const isActive = Boolean(input.isActive);
+  const jobImages = input.jobImages ?? null;
 
   if (!title || !company || !location || !description || !externalUrl) {
     throw new Error("All required job fields must be provided.");
@@ -75,6 +78,7 @@ export function validateJobInput(input: Partial<JobInput>): JobInput {
     description,
     externalUrl,
     isActive,
+    jobImages,
   };
 }
 

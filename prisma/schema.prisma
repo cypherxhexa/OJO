@@ -20,6 +20,7 @@ model Job {
   clicks      Int      @default(0)
   isActive    Boolean  @default(true)
   slug        String   @unique
+  jobImages   String?  // JSON array of image URLs e.g. ["url1","url2"]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

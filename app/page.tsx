@@ -2,7 +2,9 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { JobGrid } from "@/components/JobGrid";
 import { AdSlot } from "@/components/AdSlot";
+import { BlogPreviewSection } from "@/components/BlogPreviewSection";
 import { Suspense } from "react";
+import { prisma } from "@/lib/db";
 
 // ─── ADSENSE PLACEMENT PLAN — HOMEPAGE ────────────────────────────────────────
 // Slot 1 (of 2): Leaderboard (728×90 / 320×50) — BELOW hero, ABOVE job grid.
@@ -13,6 +15,39 @@ import { Suspense } from "react";
 // ──────────────────────────────────────────────────────────────────────────────
 
 export default async function Home() {
+  // Fetch 3 most recently published blog posts server-side
+  let latestPosts: {
+    id: number;
+    title: string;
+    slug: string;
+    excerpt: string;
+    coverImage: string | null;
+    category: string;
+    createdAt: Date;
+    content: string;
+  }[] = [];
+
+  try {
+    latestPosts = await prisma.blogPost.findMany({
+      where: { isPublished: true },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        coverImage: true,
+        category: true,
+        createdAt: true,
+        content: true,
+      },
+    });
+  } catch {
+    // Blog table may not exist in dev — silently skip
+    latestPosts = [];
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <Suspense fallback={<div className="h-16 border-b border-stone-200 bg-stone-50" />}>
@@ -72,6 +107,9 @@ export default async function Home() {
             </Suspense>
           </div>
         </section>
+
+        {/* ── BLOG PREVIEW SECTION — between job grid and footer ─────────── */}
+        <BlogPreviewSection posts={latestPosts} />
       </main>
 
       <Footer />

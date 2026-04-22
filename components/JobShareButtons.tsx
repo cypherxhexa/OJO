@@ -2,20 +2,25 @@
 
 import { useState } from "react";
 
-interface ShareButtonsProps {
+interface JobShareButtonsProps {
   url: string;
   title: string;
+  company: string;
 }
 
-export default function ShareButtons({ url, title }: ShareButtonsProps) {
+export function JobShareButtons({ url, title, company }: JobShareButtonsProps) {
   const [copied, setCopied] = useState(false);
 
-  const shareText = encodeURIComponent(`${title} — ${url}`);
+  const shareText = encodeURIComponent(
+    `Check out this job: ${title} at ${company} - ${url}`
+  );
   const encodedUrl = encodeURIComponent(url);
 
   const whatsappUrl = `https://wa.me/?text=${shareText}`;
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
-  const telegramUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodeURIComponent(title)}`;
+  const telegramUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodeURIComponent(
+    `Check out this job: ${title} at ${company}`
+  )}`;
 
   const handleCopy = async () => {
     try {
@@ -23,6 +28,7 @@ export default function ShareButtons({ url, title }: ShareButtonsProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
+      // Fallback for older browsers
       const textarea = document.createElement("textarea");
       textarea.value = url;
       document.body.appendChild(textarea);
@@ -35,9 +41,9 @@ export default function ShareButtons({ url, title }: ShareButtonsProps) {
   };
 
   return (
-    <div>
+    <div className="border-t border-stone-200 pt-8 mt-8">
       <p className="text-xs font-sans font-semibold uppercase tracking-widest text-stone-400 mb-4">
-        Share this article
+        Share this job opportunity
       </p>
       <div className="grid grid-cols-2 md:flex md:flex-row gap-2">
         {/* WhatsApp */}
@@ -90,7 +96,7 @@ export default function ShareButtons({ url, title }: ShareButtonsProps) {
               ? "border-green-500 bg-green-50 text-green-700"
               : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50 hover:border-stone-400"
           }`}
-          aria-label="Copy article link"
+          aria-label="Copy job link"
         >
           {copied ? (
             <>
