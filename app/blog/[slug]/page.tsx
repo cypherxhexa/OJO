@@ -9,7 +9,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { estimateReadTime, stripHtml } from "@/lib/blog";
+import { estimateReadTime, stripHtml, generateTableOfContents } from "@/lib/blog";
 import { splitContentAtParagraph } from "@/lib/adUtils";
 import sanitizeHtml from "sanitize-html";
 import Image from "next/image";
@@ -92,7 +92,8 @@ export default async function BlogPostPage({
 
   const readTime = estimateReadTime(post.content);
   const postUrl = `${BASE_URL}/blog/${post.slug}`;
-  const parts = splitContentAtParagraph(post.content, 3);
+  const { toc, html: processedHtml } = generateTableOfContents(post.content);
+  const parts = splitContentAtParagraph(processedHtml, 3);
   const sanitizeOptions = {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "h1", "h2"]),
     allowedAttributes: {
@@ -179,6 +180,22 @@ export default async function BlogPostPage({
                 <span>{post.views + 1} views</span>
               </div>
 
+              {/* Table of Contents */}
+              {toc.length > 0 && (
+                <div className="bg-stone-50 border border-stone-200 p-6 mb-10 rounded-sm">
+                  <h2 className="font-serif text-2xl font-bold text-stone-900 mb-4">Table of Contents</h2>
+                  <ul className="space-y-3 font-sans text-lg">
+                    {toc.map((item) => (
+                      <li key={item.id} style={{ marginLeft: `${(item.level - 2) * 1}rem` }}>
+                        <a href={`#${item.id}`} className="text-amber-700 hover:underline hover:text-amber-800 transition-colors">
+                          {item.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {/* ── AD SLOT 1/3: Leaderboard below meta, above paragraph 1 ────
                   Policy: standard editorial placement, explicitly permitted.
               ────────────────────────────────────────────────────────────── */}
@@ -191,8 +208,8 @@ export default async function BlogPostPage({
 
               {/* Article content (Part 1 - First 3 paragraphs) */}
               <div
-                className="prose prose-stone prose-lg max-w-none font-sans leading-relaxed
-                  prose-headings:font-serif prose-headings:text-stone-900
+                className="prose prose-stone max-w-none font-sans text-[1.05rem] leading-[1.5]
+                  prose-p:my-3 prose-headings:font-serif prose-headings:text-stone-900
                   prose-a:text-amber-700 prose-a:underline
                   prose-strong:text-stone-900
                   prose-li:marker:text-amber-700"
@@ -214,8 +231,8 @@ export default async function BlogPostPage({
                   
                   {/* Article content (Part 2 - Remainder) */}
                   <div
-                    className="prose prose-stone prose-lg max-w-none font-sans leading-relaxed
-                      prose-headings:font-serif prose-headings:text-stone-900
+                    className="prose prose-stone max-w-none font-sans text-[1.05rem] leading-[1.5]
+                      prose-p:my-3 prose-headings:font-serif prose-headings:text-stone-900
                       prose-a:text-amber-700 prose-a:underline
                       prose-strong:text-stone-900
                       prose-li:marker:text-amber-700 mt-6"

@@ -31,7 +31,7 @@ export default async function Home() {
     latestPosts = await prisma.blogPost.findMany({
       where: { isPublished: true },
       orderBy: { createdAt: "desc" },
-      take: 3,
+      take: 6,
       select: {
         id: true,
         title: true,

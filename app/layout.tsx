@@ -65,7 +65,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className={`${lora.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${lora.variable} ${dmSans.variable} scroll-smooth`}>
       <head>
         {/* AdSense script — only renders when NEXT_PUBLIC_ADSENSE_CLIENT is set */}
         <AdsenseScript />
