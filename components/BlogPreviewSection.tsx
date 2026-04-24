@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { estimateReadTime, stripHtml } from "@/lib/blog";
+import { estimateReadTime, stripHtml } from "@/lib/blog-utils";
 
 interface BlogPost {
   id: number;

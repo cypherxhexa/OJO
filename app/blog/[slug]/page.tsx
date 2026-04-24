@@ -9,7 +9,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { estimateReadTime, stripHtml, generateTableOfContents } from "@/lib/blog";
+import { estimateReadTime, stripHtml, generateTableOfContents } from "@/lib/blog-utils";
 import { splitContentAtParagraph } from "@/lib/adUtils";
 import sanitizeHtml from "sanitize-html";
 import Image from "next/image";

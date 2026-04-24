@@ -7,7 +7,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
-import { estimateReadTime } from "@/lib/blog";
+import { estimateReadTime } from "@/lib/blog-utils";
 
 export const metadata: Metadata = {
   title: "Overseas Work Guides & OFW Tips | Job Opp Jarrar",
