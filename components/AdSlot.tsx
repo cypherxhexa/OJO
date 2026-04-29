@@ -32,6 +32,12 @@ const FORMAT_DIMENSIONS: Record<AdFormat, { label: string; minH: string; maxW: s
 
 const CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
+// Controls whether dashed placeholder boxes are visible when CLIENT is not set.
+// Set to 'true' during development/testing to see ad positions.
+// Set to 'false' (or leave unset) before applying for AdSense and in production.
+// Real AdSense ads always render regardless of this setting.
+const SHOW_PLACEHOLDERS = process.env.NEXT_PUBLIC_SHOW_AD_PLACEHOLDERS === "true";
+
 export function AdSlot({ slotId, format, className = "" }: AdSlotProps) {
   useEffect(() => {
     // Only push ads if client ID and slot ID are both configured
@@ -49,9 +55,15 @@ export function AdSlot({ slotId, format, className = "" }: AdSlotProps) {
   const { label, minH, maxW } = FORMAT_DIMENSIONS[format];
 
   // ── Placeholder mode (no client ID or no slot ID) ──────────────────────────
-  // Shows a dashed placeholder so the client can see ad positions during
-  // testing, before AdSense account is approved and IDs are entered.
+  // When SHOW_PLACEHOLDERS is false, return nothing — the layout collapses
+  // naturally with no gap. This is the correct state for AdSense review.
+  // When SHOW_PLACEHOLDERS is true, show the dashed box for dev/testing.
   if (!CLIENT || !slotId) {
+    if (!SHOW_PLACEHOLDERS) {
+      // Hidden for AdSense approval — code intact, zero output
+      return null;
+    }
+
     return (
       <div className={`w-full ${className}`}>
         {/* "Advertisement" label — shown above every real slot too */}
